@@ -24,6 +24,7 @@ const render = async (root, state) => {
 // create content
 // This function will render dynamic two views based if user selecs home page or specific rover data
 const App = (state) => {
+  let apod = state.get("apod");
   let rovers = state.get("rovers");
   let user = state.get("user");
   let selectedRover = state.get("selectedRover");
@@ -44,20 +45,26 @@ const App = (state) => {
       <header class="app-header">${AppHeader(rovers)}</header>
       <main>
           <section>
-              <div><strong>Launch Date:</strong> ${
+              <h3>Welcome to ${selectedRover} Page</h3>
+              <p><strong>Launch Date:</strong> ${
                 roverInfo.roverData.photo_manifest.launch_date
-              }</div>
-              <div><strong>Landing Date:</strong> ${
+              }</p>
+              <p><strong>Landing Date:</strong> ${
                 roverInfo.roverData.photo_manifest.landing_date
-              }</div>
-              <div><strong>Status:</strong> ${
+              }</p>
+              <p><strong>Status:</strong> ${
                 roverInfo.roverData.photo_manifest.status
-              }</div>
-              <div>
-              ${roverPics.pics.latest_photos.map(
-                (img) =>
-                  `<img src=${img.img_src} alt="rover_pic" width="300" height="300" />`
-              )}
+              }</p>
+              <div class="pic-gallary">
+              ${roverPics.pics.latest_photos
+                .map(
+                  (img) =>
+                    `<div class="sImage">
+                      <img src=${img.img_src} alt="rover_pic" width="300" height="300" />
+                      <p><strong>Photo date: </strong>${img.earth_date}</p>
+                    </div>`
+                )
+                .join(" ")}
               </div>
           </section>
       </main>
@@ -79,7 +86,7 @@ const App = (state) => {
                   explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
                   but generally help with discoverability of relevant imagery.
               </p>
-              
+              ${ImageOfTheDay(apod)}
           </section>
       </main>
       ${AppFooter()}
@@ -110,19 +117,41 @@ const Greeting = (name) => {
 //Application Header component
 const AppHeader = (rovers) => {
   if (rovers) {
-    const roversList = rovers.map(
-      (rover) =>
-        `<li><a href="" name="${rover}" onclick="handleClick(event,false)">${rover}</a></li>`
-    );
     return `
         <nav>
           <ul>
-            <div class="site-name">NASA API</div>
-            ${Array.from(roversList).join(" ")}
+            <div class="site-name" onclick="handleClick(event,true)">NASA ROVERS</div>
+            ${Array.from(getRoverList(rovers, false)).join(" ")}
+            <a href="" class="ham-menu" onclick="showHamburgurMenu(event)"><i class="fa fa-bars"></i></a>
           </ul>
         </nav>
+        <div>
+          ${Array.from(getRoverList(rovers, true)).join(" ")}
+        </div>
     `;
   }
+};
+
+const getRoverList = (rovers, isMobile) => {
+  const roversList = rovers.map(
+    (rover) =>
+      `<li class="${
+        isMobile ? "mobile-menu" : "normal-menu"
+      }"><a href="" name="${rover}" onclick="handleClick(event,false)">${rover}</a></li>`
+  );
+  return roversList;
+};
+
+const showHamburgurMenu = (e) => {
+  e.preventDefault();
+  const mobileMenu = document.querySelectorAll(".mobile-menu");
+  mobileMenu.forEach((menu) => {
+    if (menu.style.display === "block") {
+      menu.style.display = "none";
+    } else {
+      menu.style.display = "block";
+    }
+  });
 };
 
 const AppFooter = () => {
@@ -149,7 +178,7 @@ const ImageOfTheDay = (apod) => {
   console.log(photodate.getDate() === today.getDate());
   if (!apod || apod.date === today.getDate()) {
     getImageOfTheDay(store);
-    return;
+    return `Image is Loading...`;
   }
 
   // check if the photo of the day is actually type video!
