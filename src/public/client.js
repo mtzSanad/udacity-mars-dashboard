@@ -24,12 +24,12 @@ const render = async (root, state) => {
 // create content
 // This function will render dynamic two views based if user selecs home page or specific rover data
 const App = (state) => {
-  let apod = state.get("apod");
-  let rovers = state.get("rovers");
-  let user = state.get("user");
-  let selectedRover = state.get("selectedRover");
-  let roverInfo = state.get("roverInfo");
-  let roverPics = state.get("roverPics");
+  const apod = state.get("apod");
+  const rovers = state.get("rovers");
+  const user = state.get("user");
+  const selectedRover = state.get("selectedRover");
+  const roverInfo = state.get("roverInfo");
+  const roverPics = state.get("roverPics");
   if (selectedRover) {
     //Check if no rovers info load it first
     //getRoversInfo fires updateStore which in return re-render the view, 2nd run will not go inside this method
@@ -68,13 +68,13 @@ const App = (state) => {
               </div>
           </section>
       </main>
-      ${AppFooter()}
+      ${AppFooter(wrapFooterTag)("Msanad - Udacity - Project - 2022")}
     `;
   } else {
     return `
       <header class="app-header">${AppHeader(rovers)}</header>
       <main>
-          ${Greeting(user.get("name"))}
+          ${Greeting(welcomeInEnglish)(user.get("name"))}
           <section>
               <h3>Welcome to NASA Info Website!</h3>
               <p>This is Astronomy Picture of the Day!</p>
@@ -89,7 +89,7 @@ const App = (state) => {
               ${ImageOfTheDay(apod)}
           </section>
       </main>
-      ${AppFooter()}
+      ${AppFooter(wrapFooterTag)("Msanad - Udacity - Project - 2022")}
     `;
   }
 };
@@ -102,10 +102,17 @@ window.addEventListener("load", () => {
 // ------------------------------------------------------  COMPONENTS
 
 // Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
-const Greeting = (name) => {
+
+//We can create diffrent versions of welcome
+const welcomeInEnglish = (name) => {
+  return `Welcome, ${name}!`;
+};
+
+//When calling the greeting we can specify which version we may use
+const Greeting = (fn) => (name) => {
   if (name) {
     return `
-            <h1>Welcome, ${name}!</h1>
+            <h1>${fn(name)}</h1>
         `;
   }
 
@@ -154,8 +161,13 @@ const showHamburgurMenu = (e) => {
   });
 };
 
-const AppFooter = () => {
-  return "<footer>Msanad - Udacity - Project - 2022</footer>";
+//Msanad - Udacity - Project - 2022
+const wrapFooterTag = (data) => {
+  return `<footer>${data}</footer>`;
+};
+
+const AppFooter = (fn) => (data) => {
+  return fn(data);
 };
 
 //Hanldes user clics on app header to either render home page or rovers pages

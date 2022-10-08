@@ -18,7 +18,7 @@ const apiBaseUrl = "https://api.nasa.gov/mars-photos/api/v1";
 // Calling picture of the day
 app.get("/apod", async (req, res) => {
   try {
-    let image = await fetch(
+    const image = await fetch(
       `https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`
     ).then((res) => res.json());
     res.send({ image });
@@ -30,7 +30,7 @@ app.get("/apod", async (req, res) => {
 // Getting rover data
 app.get("/rover/:rover_name", async (req, res) => {
   try {
-    let roverData = await fetch(
+    const roverData = await fetch(
       `${apiBaseUrl}/manifests/${req.params.rover_name}?api_key=${process.env.API_KEY}`
     ).then((res) => res.json());
     res.send({ roverData });
@@ -44,7 +44,7 @@ app.get("/rover/:rover_name", async (req, res) => {
 // You can find the documentation in authors github account @ https://github.com/chrisccerami/mars-photo-api
 app.get("/rover/pics/:rover_name", async (req, res) => {
   try {
-    let pics = await fetch(
+    const pics = await fetch(
       `${apiBaseUrl}/rovers/${req.params.rover_name}/latest_photos?&api_key=${process.env.API_KEY}`
     ).then((res) => res.json());
     res.send({ pics });
